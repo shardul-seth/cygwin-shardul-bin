@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# shortcut script by shardul
+
+if [ x$1 == "x-h" ] || [ x$1 == "x--help" ] ; then 
+	echo -e "$(basename $0) v0.1\n  \
+	Usage: \n 	\
+	$(basename $0) [/path/to/root/directory] \n	 \
+	$(basename $0) --kill"
+	exit 1
+fi
+
+webfsd=$(ps -A | grep webfsd | awk '{ print $1 }')
+if [ "x${webfsd}" != "x" ]; then
+	sudo kill ${webfsd}
+	if [ x$1 == "x--kill" ]; then
+		exit 0
+	fi
+fi
+
+if [ x$1 == "x" ] || [ ! -d $1 ] ; then 
+	echo -e "Starting at current directory..\nFor another root directory, use $(basename $0) [/path/to/dir]\n"
+	webfsd
+else
+	webfsd -r $1
+fi
+
+

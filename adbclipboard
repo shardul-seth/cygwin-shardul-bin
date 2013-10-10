@@ -1,0 +1,23 @@
+#!/bin/bash
+
+myHelp(){
+	echo -e "$(basename $0) : Get android clipboard contents\n$(basename $0) \"text to set as clipboard\" : Set clipboard"
+}
+
+if [ $(adb devices | grep -c device) -lt 2 ]; then 
+	echo "No device found!"
+	echo "Please connect phone with USB debugging enabled!"; 
+	exit 1
+fi
+
+if [ $(adb shell pm list packages clipper | grep -c zgrs) -eq 0 ]; then
+	echo "Clipper apk not installed!"
+	echo 'See https://github.com/majido/clipper to build'
+	exit 1
+fi
+
+if [ x$1 == "x" ]; then
+	adb shell am broadcast -a clipper.get
+else
+	am broadcast -a clipper.set -e text "$1"
+fi

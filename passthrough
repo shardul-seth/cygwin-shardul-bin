@@ -1,0 +1,27 @@
+if [ z$1 == "z" ]; then
+	echo 'Usage passthrough [start|stop]'
+	exit
+fi
+
+if [ $1 == "start" ]; then
+	sudo brctl addbr br0
+
+	for i in eth0 usb0; do
+		  sudo ifconfig $i 0.0.0.0
+		  sudo brctl addif br0 $i
+	done
+
+	sudo ifconfig br0 up
+	sudo dhclient br0 
+	# might take a few seconds
+	adb shell netcfg usb0 dhcp
+	echo "Done!"
+	exit
+fi
+
+if [ $1 == "stop" ]; then
+	for i in eth0 usb0 br0; do sudo ifconfig $i down; done
+	sudo brctl delbr br0
+	sudo ifconfig eth0 up
+	sudo dhclient eth0
+fi

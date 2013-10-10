@@ -1,0 +1,7 @@
+#!/bin/bash
+
+#remove history
+if [ -e ~/.local/share/recently-used.xbel ]; then
+	rm ~/.local/share/recently-used.xbel
+fi
+

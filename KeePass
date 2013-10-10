@@ -1,0 +1,14 @@
+#!/bin/bash
+
+which mono
+if [ $? -ne 0 ]; then
+	echo 'mono missing: mono runtime is required to run KeePass'
+	exit 1
+fi
+
+if [ -f ${HOME}/Programs/Keepass/KeePass.exe ]; then
+	mono ${HOME}/Programs/Keepass/KeePass.exe
+else
+	echo -e "Kindly extract latest zip download of KeePass \n  into ${HOME}/Programs/Keepass directory\n  and run again!"
+	exit 1
+fi

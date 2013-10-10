@@ -1,0 +1,1 @@
+ARCH=arm CROSS_COMPILE=${HOME}/Android/toolchains/linaro_4.7/bin/arm-eabi- $1 $2 $3 $4 $5 $6 $7 $8 $9

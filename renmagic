@@ -1,0 +1,29 @@
+#!/bin/bash
+
+if [ "x$1" == "x" ] || [ $1 == "-h" ] || [ $1 == "-help" ] || [ ! -f "$1" ]; then
+	echo -e "renmagic\n  Rename files based on file header magic signature \n  Usage: renmagic [file to rename] \n"
+	exit 1
+fi
+
+ifile="$1"
+iexit=0
+
+imime=$(file -b --mime-type -- "${ifile}")
+
+# imime1=${imime%/*}
+# imime2=${imime#*/}
+
+iext="$(grep "$imime" < ~/bin/renmagic.mime | awk '{print $1}')"
+
+if [ "x${iext}" == "x" ]; then 
+	iext="???"
+fi
+
+mv -- "${ifile}" "${ifile}".${iext}
+
+if [ $? -ne 0 ]; then
+	echo "Move failed"
+	iexit=2
+fi
+
+exit ${iexit}

@@ -1,0 +1,118 @@
+#!/bin/bash
+
+# by shajul - helper functions for Autokey scripts
+
+
+################  FUNCTIONS ##############################################
+usage() {
+	cat <<END
+Usage: $(basename $0) <command> [<parameters>]
+
+Commands:
+  exec <want_root=0|1> <commands> 
+  	Executes given commands
+  	
+  activate <want_root[+window_class]> <commands>
+  	Activate if window exists or start new window
+  	As there may be several windows in a process you can specify
+  	which class of window should be activated.
+  	eg. $(basename $0) activate 1+nautilus.Nautilus nautilus
+END
+}
+
+my_exec() {
+	# check if we are root
+	is_root=0
+	if [ $(id | grep -c 'id=0') -gt 0 ]; then is_root=1; fi
+
+	# check if root wanted
+	local want_root=$1
+	local my_command=$2
+	
+	###################################################
+	#                                                 #
+	#  is_root | want_root | prefix                   #
+	#  ---------------------------------------------- #
+	#    1     |     1     |   ""                     #
+	#    1     |     0     |   "sudo -u $SUDO_USER"   #
+	#    0     |     1     |   "gksudo"               #
+	#    0     |     0     |   ""	                    #
+	#                                                 #
+	###################################################
+	
+	prefix=""
+	if [ $is_root -eq 1 ] && [ $want_root -eq 0 ] && [ x$SUDO_USER != "x" ]; then
+			prefix="sudo -u $SUDO_USER"
+	fi
+	
+	if [ $is_root -eq 0 ] && [ $want_root -eq 1 ]; then
+			prefix="gksudo"
+	fi
+		
+	$prefix $my_command &
+	exit $?
+}
+
+my_activate_or_exec() {
+	# check if root wanted
+	local want_root=$1
+	local my_class=$2
+	local my_command=$3
+	
+	if [ $my_class = "none" ]; then my_class="";	fi
+	micro_command=$(echo $my_command | cut -d ' ' -f1)
+	
+	if [ $want_root -eq 1 ]; then
+		my_user="root"
+	else
+		[ x$SUDO_USER != "x" ] && my_user=$SUDO_USER || my_user=$USER
+	fi
+	
+	command_id=$(ps -u $my_user | grep -m 1 ${micro_command:0:15} | cut -d ' ' -f 1-2)
+	echo microcommand $micro_command my_user $my_user command_id $command_id
+	if [ $command_id ]; then
+		command_wid=$(wmctrl -xlp | grep $command_id | grep "$my_class" | cut -d ' ' -f1)
+	fi
+	
+	if [ $command_wid ]; then
+		echo activating window $command_id and wid $command_wid
+		wmctrl -ia $command_wid
+	else
+		echo executing command $my_command
+		my_exec $want_root "$my_command"
+	fi
+	
+}
+
+################  END OF FUNCTIONS  ######################################
+if [ $# -lt 1 ]; then
+	usage
+	exit 1
+fi
+
+case $1 in
+	--help | -h)
+		usage
+		exit 0
+	;;
+
+	exec) 
+		want_root=$2
+		shift 2
+		my_exec $want_root "$@"
+	;;
+
+	activate)
+		want_root=$(echo "${2}+" | cut -d'+' -f1)
+		my_class=$(echo "${2}+" | cut -d'+' -f2)
+		if [ ! $my_class ]; then my_class="none"; fi
+		shift 2
+		my_activate_or_exec $want_root $my_class "$@"
+	;;
+
+	*) 
+		usage
+		exit 1
+	;;
+esac
+

@@ -1,0 +1,11 @@
+
+# shell script to decompile with tagged framework
+
+if [ $# -ne "2" ] || [ ! -f $2 ]; then
+	echo -e "\nUsage: $0 [framework-tag] [apk-to-decompile]"
+	echo -e "\nTo tag framework do \"./apktool if framework-res.apk [framework-tag]\"\n"
+	exit
+fi
+
+./apktool d -f -t $1 $2
+

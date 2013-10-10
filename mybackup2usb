@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# script by me for backup of hard drive to USB drive
+
+if [[ ! $(mountpoint /media/Passport) || ! $(mountpoint /media/Ubuntu) ]]; then
+	echo "Please connect the usb drive"
+	exit
+else
+	echo -e "$(tput bold)$(tput setaf 2)USB drive connected .. OK\nBackup starting..$(tput sgr0)"
+fi
+
+dirs='Dropbox
+_Documents/Documents
+_Documents/Mobile
+_Documents/Photos
+_Safe
+_Live
+Projects
+Programs'
+
+for dir in $dirs; do 
+	echo "$(tput bold)$(tput setaf 2)Backing up ${dir} .. $(tput sgr0)"
+	if [ ! -d /media/Passport/$dir ]; then mkdir -p /media/Passport/$dir; fi
+	cp -uvR --target-directory=/media/Passport/$dir /media/D/$dir/*
+done
+
+dirsU='Backup
+bin
+Documents
+Projects
+git'
+
+for dir in $dirsU; do 
+	echo "$(tput bold)$(tput setaf 2)Backing up ${dir} .. $(tput sgr0)"
+	if [ ! -d /media/Ubuntu/home/leo/$dir ]; then mkdir -p /media/Ubuntu/home/leo/$dir; fi
+	cp -uvR --target-directory=/media/Ubuntu/home/leo/$dir /home/shardul/$dir/*
+done
+
+echo -e "\n$(tput bold)$(tput setaf 2)Backup Complete. $(tput sgr0)"
+

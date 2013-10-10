@@ -1,0 +1,17 @@
+mysdcard=$(date "+%Y%m%d%H%M")
+
+mkdir -p ${mysdcard}
+if [ $? -ne 0 ]; then
+	busybox mkdir -p ${mysdcard}
+fi
+
+adb pull /data/data/com.android.providers.contacts  ${mysdcard}/contacts
+adb pull /data/data/com.android.providers.telephony ${mysdcard}/telephony
+adb pull /data/data/com.google.android.gm ${mysdcard}/gm
+adb pull /data/data/com.google.android.gsf ${mysdcard}/gsf
+adb pull /data/data/com.google.android.gsf.login ${mysdcard}/gsflogin
+adb pull /data/data/com.facebook.katana ${mysdcard}/katana
+adb pull /data/data/com.android.browser ${mysdcard}/browser
+adb pull /data/data/com.android.providers.calendar ${mysdcard}/calendar
+
+

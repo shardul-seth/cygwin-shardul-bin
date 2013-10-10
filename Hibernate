@@ -1,0 +1,5 @@
+zenity --question --title=Hibernate --window-icon=question --timeout=10  --text="Are you sure?" --ok-label=Yes --cancel-label=No
+if [ $? -eq 1 ]; then 
+	exit 1
+fi
+sudo hibernate
